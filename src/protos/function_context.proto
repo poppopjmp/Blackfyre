@@ -1,0 +1,64 @@
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+// [START declaration]
+syntax = "proto3";
+package blackfyre.protobuf;
+// [END declaration]
+
+
+// [START messages]
+
+
+
+message FunctionContext {
+
+  string name = 1; // Function name
+
+  uint64 start_address = 2;
+
+  uint64 end_address = 3;
+
+  bool is_thunk = 4;
+
+  uint32 proc_type = 5; // (e.g. x86 vs ARM)
+
+  string segment_name = 6;
+
+  repeated BasicBlockContext basic_block_context_list = 7;
+
+  uint64 total_instructions = 8;
+
+  string decompiled_code = 9;
+
+}
+
+message BasicBlockContext {
+
+  uint64 start_address = 1;
+
+  uint64 end_address = 2;
+
+  uint32 proc_type = 3; // (e.g. x86 vs ARM)
+
+  repeated InstructionContext instruction_context_list = 4;
+
+}
+
+
+message InstructionContext {
+
+  uint64 address = 1;
+
+  bytes  opcode_bytes = 2;
+
+  string mnemonic = 3;
+
+}
+
+// [END messages]

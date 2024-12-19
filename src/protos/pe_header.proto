@@ -1,0 +1,74 @@
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+// [START declaration]
+syntax = "proto3";
+package blackfyre.protobuf;
+option java_outer_classname = "PEHeaderOuterClass";
+// [END declaration]
+
+
+// [START messages]
+
+message PEHeader{
+
+  // ** PE Header  **
+
+  uint64 time_stamp = 1;
+
+  uint64 size_of_image = 2;
+
+  uint64 address_of_entry_point = 3;
+
+  uint64 size_of_initialized_data = 4;
+
+  uint64 size_of_code = 5;
+
+  uint64 size_of_raw_data = 6;
+
+  uint64 checksum = 7;
+
+  uint64 dll_characteristics = 8;
+
+  uint64 number_of_sections = 9;
+
+  uint64 major_linker_version = 10;
+
+  uint64 major_image_version = 11;
+
+  uint64 size_of_uninitialized_data = 12;
+
+  uint64 base_of_code = 13;
+
+  uint64 minor_linker_version = 14;
+
+  uint64 size_of_headers = 15;
+
+  uint64 major_operating_system_version = 16;
+
+  uint64 size_of_stack_reserve = 17;
+
+  uint64 file_alignment = 18;
+
+  uint64 minor_image_version = 19;
+
+  uint64 major_subsystem_version = 20;
+
+  uint64 size_of_stack_commit = 21;
+
+  uint64 size_of_heap_reserve = 22;
+
+  string nt_header_name = 23;
+
+  // ** END PE Header **
+
+}
+
+
+
+// [END messages]
