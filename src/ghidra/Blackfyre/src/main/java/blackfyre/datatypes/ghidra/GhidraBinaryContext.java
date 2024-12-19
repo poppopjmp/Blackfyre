@@ -1,5 +1,6 @@
 package blackfyre.datatypes.ghidra;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,132 +40,132 @@ import ghidra.program.util.DefinedDataIterator;
 import ghidra.util.task.TaskMonitor;
 
 public class GhidraBinaryContext extends BinaryContext{
-    
+
     private boolean theIsInitialized = false;
-    
+
     protected Program theCurrentProgram;
-    
+
     protected TaskMonitor theMonitor;
-    
+
     protected boolean theIncludeDecompiledCode;
-    
+
     protected int theDecompileTimeoutSeconds;
-    
+
     public GhidraBinaryContext(Program currentProgram,TaskMonitor monitor, boolean includeDecompiledCode, int decompileTimeoutSeconds )
-        
+
     {
-        super();    
-        
+        super();
+
         theCurrentProgram = currentProgram;
         theMonitor = monitor;
         theIncludeDecompiledCode = includeDecompiledCode;
         theDecompileTimeoutSeconds = decompileTimeoutSeconds;
-        
+
     }
-    
+
     public boolean initialize() throws Exception
     {
-        
+
         if(theIsInitialized)
         {
             return theIsInitialized;
         }
-        
+
         // Binary Name
  		theName = getBinaryNameFromGhidra();
- 	
+
 //     	    // Binary Sha256
      	theSHA256Hash = getBinarySHA256FromGhidra();
- 		
+
 //     		//Word size
      	theWordSize = getWordSizeFromGhidra();
- 		
- 		
+
+
  		// File Type
  		theFileType  = getFileTypeFromGhidra();
- 		
- 		
+
+
  		// Processor Type
  		theProcType = getProcessTypeFromGhidra();
- 		
+
  		// Endness
  		theEndness = getEndnessFromGhidra();
- 				
- 		
- 		
+
+
+
  		theLanguageID = getLanguageIDFromGhidra();
-        
+
         theStringRefs = getStringRefsFromGhidra();
-        
+
         theImportSymbols = getImportSymbolsFromGhidra();
-        
+
         theFunctionContexts = getDisassemblyFunctionListFromGhidra();
-        
+
         theTotalFunctions =theFunctionContexts.length;
-        
-        theTotalInstructions = getTotalInstructionsFromGhidra(); 
-        
-        
+
+        theTotalInstructions = getTotalInstructionsFromGhidra();
+
+
         theDisassemblerType = DisassemblerType.Ghidra;
-        
+
         theCalleeToCallersMap = getCalleeToCallersMapFromGhidra();
-        
+
         theCallerToCalleesMap = getCallerToCalleesMap();
-        
+
         theRawBinaryFilePath = getRawBinaryFilePathFromGhidra();
-        
+
         theDefinedDataMap = getDefinedDataRefsFromGhidra();
-        
+
         theExportSymbols = getExportSymbolsFromGhidra();
-        
+
         theFileSize = getFileSizeFromGhidra();
-        
+
         theDisassemblerVersion = getDisassemblerVersionFromGhida();
-        
-        
+
+
         initializeHeader();
-        
-        
-        
+
+
+
         theIsInitialized = true;
-                
+
         return theIsInitialized;
     }
-    
+
     protected void initializeHeader() throws Exception
     {
     	//Intentionally left blank.  For children that need to initialize their header
     }
-    
+
     protected HashMap<Long,ArrayList<Long> >  getCalleeToCallersMapFromGhidra()
     {
-    	
+
     	HashMap<Long,ArrayList<Long>> calleeToCallersMap = new HashMap<Long,ArrayList<Long>>();
-    	
+
     	ReferenceManager referenceManager = theCurrentProgram.getReferenceManager();
-    	
+
     	FunctionManager functionManager = theCurrentProgram.getFunctionManager();
-    	    	
-    	
+
+
     	// Iterate of each function to get its callers
     	for( Function ghidraFunction : theCurrentProgram.getFunctionManager().getFunctions(true))
 		{
-    		
+
     		Long calleeAddress = ghidraFunction.getEntryPoint().getOffset();
-    		
+
     		ArrayList<Long> callerList = new ArrayList<Long>() ;
-    		
+
 			//println(String.format("(0x%08X) %s", functionAddress, ghidraFunction.getName()));
-			
-    		
+
+
     		// Get the callers of the current function
-    		for ( var reference: referenceManager.getReferencesTo(ghidraFunction.getEntryPoint())) 
+    		for ( var reference: referenceManager.getReferencesTo(ghidraFunction.getEntryPoint()))
     		{
-    			
-    			// Caller's address    			    			
+
+    			// Caller's address
     			Address callerAddress = reference.getFromAddress();
-    			    			
-    			
+
+
     			// Check that the caller address is a function
     			Function callerFunction = functionManager.getFunctionContaining(callerAddress);
     			if(callerFunction == null)
@@ -174,135 +175,135 @@ public class GhidraBinaryContext extends BinaryContext{
     				continue;
     			}
     			//println(String.format("\tCaller (0x%08X) %s", callerFunction.getEntryPoint().getOffset(), callerFunction.getName()));
-    			
-    			
+
+
     			// Add the caller's address to the list
     			callerList.add(callerFunction.getEntryPoint().getOffset());
-    			
+
     		}
-    		
+
     		// Add the caller information of the target function to the map
     		calleeToCallersMap.put(calleeAddress, callerList);
- 							
+
 		}
- 	
+
     	return calleeToCallersMap;
     }
-    
-    
-    protected int getTotalInstructionsFromGhidra() 
+
+
+    protected int getTotalInstructionsFromGhidra()
     {
     	int totalInstructions = 0;
-    	
+
     	for( @SuppressWarnings("unused") Instruction instruction : theCurrentProgram.getListing().getInstructions(true))
     	{
     		totalInstructions +=1;
     	}
-    	    	
-    	
+
+
     	return totalInstructions;
     }
-    
-    
+
+
     protected HashMap<Long, ArrayList<Long>>  getCallerToCalleesMap() throws Exception
 	{
-    	
+
     	// Check that the callermap has already been initialized
     	if(theCalleeToCallersMap == null)
     	{
     		throw new Exception("Attribute 'theCAllerMap' is not initialized");
     	}
-    	
+
 		// From the caller map, we can derive the callee map
 		HashMap<Long, ArrayList<Long>> callerToCallees = new HashMap<Long, ArrayList<Long>>();
-		
+
 		for( var callee2CallersEntry: theCalleeToCallersMap.entrySet() )
-		{		
+		{
 			Long calleeAddress = callee2CallersEntry.getKey();
-			
+
 			for ( var callerAddress : callee2CallersEntry.getValue())
 			{
-				
+
 				ArrayList<Long> calleeList  = callerToCallees.get(callerAddress);
 				// Check if the ArrayList has been initialized
 				if(calleeList == null)
 				{
 					calleeList  = new ArrayList<Long>();
-					
+
 					// Add the key:list pair to the map
 					callerToCallees.put(callerAddress, calleeList);
 				}
-				
+
 				// Add the callee address to the list
-				calleeList.add(calleeAddress);	
-				
+				calleeList.add(calleeAddress);
+
 				//println(String.format("\tCaller (0x%08X) --> Callee (0x%08X) ", callerAddress, calleeAddress));
 			}
-						
+
 		}
-		
+
 		return callerToCallees;
 	}
-    
-    
+
+
     protected FunctionContext [] getDisassemblyFunctionListFromGhidra()
 	{
-		
-		ArrayList<FunctionContext>  functionContextArrayList  =  new ArrayList<FunctionContext>();
-		
 
-		
+		ArrayList<FunctionContext>  functionContextArrayList  =  new ArrayList<FunctionContext>();
+
+
+
 		for( Function ghidraFunction : theCurrentProgram.getFunctionManager().getFunctions(true))
 		{
-			GhidraFunctionContext ghidraFunctionContext = new GhidraFunctionContext(theCurrentProgram, 
-																					ghidraFunction, 
-																					theMonitor, 
+			GhidraFunctionContext ghidraFunctionContext = new GhidraFunctionContext(theCurrentProgram,
+																					ghidraFunction,
+																					theMonitor,
 																					getProcType(),
 																					theIncludeDecompiledCode,
 																					theDecompileTimeoutSeconds);
-			
+
 			functionContextArrayList.add(ghidraFunctionContext);
-			
-						
+
+
 		}
-		
+
 		FunctionContext [] functionContexts = functionContextArrayList.toArray(new FunctionContext[functionContextArrayList.size()]);
-					
-		
+
+
 		return functionContexts;
 	}
-    
+
     protected HashMap<Long, DefinedData> getDefinedDataRefsFromGhidra() throws Exception
     {
     	HashMap<Long, DefinedData> definedDataRefs = new HashMap<Long, DefinedData>();
-    	
+
     	for (var data: theCurrentProgram.getListing().getDefinedData(true))
     	{
     		//System.out.println("DataType is: "+data.getDataType());
-    		
+
     		DefinedData definedData = null;
     		DataType dataType = null;
 
 			if(data.getDataType() instanceof WordDataType )
 			{
-				dataType = DataType.WORD;								
-    							    			
+				dataType = DataType.WORD;
+
 			}
 			else if(data.getDataType() instanceof DWordDataType)
 			{
-    			
+
 				dataType = DataType.DWORD;
-				    			
+
 			}
 			else if(data.getDataType() instanceof QWordDataType)
 			{
-				
+
 				dataType = DataType.QWORD;
-    			
+
 			}
 			else if(data.getDataType() instanceof Pointer )
 			{
-							
+
 				if(data.getLength() == 4)
 				{
 					dataType = DataType.POINTER32;
@@ -310,148 +311,148 @@ public class GhidraBinaryContext extends BinaryContext{
 				else if (data.getLength() ==  8)
 				{
 					dataType = DataType.POINTER64;
-				}							
-				
+				}
+
 			}
-			
-			
+
+
 			if(dataType != null)
 			{
-				
+
 				ArrayList<Long>  references  =  new ArrayList<Long>();
-				
+
 				long definedDataAddress = data.getAddress().getOffset();
-								
-				
+
+
 				for(var reference :  theCurrentProgram.getReferenceManager().getReferencesTo(data.getAddress()))
 				{
 					long referenceFromAddress = reference.getFromAddress().getOffset();
-					
+
 					references.add(referenceFromAddress);
-					
+
 				}
-				
-				try 
+
+				try
 				{
-				
+
 					definedData = new DefinedData(definedDataAddress,data.getBytes(),dataType, references ,data.getLength());
-												
+
 					definedDataRefs.put(definedDataAddress, definedData);
 				}
 				catch(Exception e)
 				{
 					// Do nothing... we are unable to get the defined data
 				}
-				
+
 			}
-    		
+
     	}
-    	
-    	
-    	
+
+
+
     	return definedDataRefs;
     }
-    
-    
+
+
     protected HashMap<Long,String> getStringRefsFromGhidra()
     {
         HashMap<Long,String> stringRefs = new HashMap<Long,String>();
-        
+
         // Iterate through the program to get string refs
-        var definedDataInterator  =  DefinedDataIterator.definedStrings(theCurrentProgram);     
+        var definedDataInterator  =  DefinedDataIterator.definedStrings(theCurrentProgram);
         for( var definedData: definedDataInterator)
         {
             if(definedData.hasStringValue())
-            {                           
+            {
                 String programString = definedData.getDefaultValueRepresentation();
-                    
-//              String progressMessage = String.format("[0x%08X] String: %s", 
-//                        definedData.getAddress().getOffset(), 
-//                        programString);   
+
+//              String progressMessage = String.format("[0x%08X] String: %s",
+//                        definedData.getAddress().getOffset(),
+//                        programString);
 //              System.out.println(progressMessage);
-                
+
                 var refenceInterator = theCurrentProgram.getReferenceManager().getReferencesTo(definedData.getAddress());
-                
+
                 for ( var reference : refenceInterator)
                 {
-                    
+
                     long referenceFromAddress = reference.getFromAddress().getOffset();
-                                            
-                    
+
+
                     stringRefs.put(referenceFromAddress, programString);
-                    
+
                 }
-                
+
             }
         }
-                
+
         return stringRefs;
     }
-    
-    
+
+
     protected ImportSymbol [] getImportSymbolsFromGhidra()
     {
-        
+
         ArrayList<ImportSymbol>  importSymbolList  =  new ArrayList<ImportSymbol>();
-        
+
         for(Function function : theCurrentProgram.getFunctionManager().getFunctions(true))
         {
             // Only add thunks to symbol list
             if(function.isThunk())
             {
                 Function thunkedFunction = function.getThunkedFunction(true);
-                
+
                 if(thunkedFunction != null && thunkedFunction.getExternalLocation() != null)
                 {
                     String functionName = function.getName();
                     String libraryName = thunkedFunction.getExternalLocation().getLibraryName();
                     long address = function.getEntryPoint().getOffset();
-                    
+
                     ImportSymbol importSymbol = new ImportSymbol(functionName, libraryName, address);
-                    
+
                     importSymbolList.add(importSymbol);
                 }
-            }                   
+            }
         }
-        
-        
+
+
         // Iterate over symbols
         for(Symbol symbol : theCurrentProgram.getSymbolTable().getExternalSymbols())
         {
         	String importName = symbol.getName();
         	String libraryName = "";
         	long address = 0;
-        	
-  
-        	
+
+
+
         	// An indirect method to get the address where the symbol is defined that works.  The direct approaches such as
         	// getting the symbol.getAddress() or symbol.getProgramLocation().getAddress() or external function did not return
         	// valid addresses.
         	if(symbol.hasReferences())
         	{
         		address = symbol.getReferences()[0].getFromAddress().getOffset();
-        		
+
         	}
-        	        	        
-        	
+
+
         	Symbol parentSymbol = symbol.getParentSymbol();
         	if (parentSymbol != null)
         	{
         		libraryName = parentSymbol.getName();
         	}
-        	
+
         	ImportSymbol importSymbol = new ImportSymbol(importName, libraryName, address);
             importSymbolList.add(importSymbol);
-        		
+
         }
 
-        
+
         ImportSymbol [] importSymbols = importSymbolList.toArray(new ImportSymbol[importSymbolList.size()]);
-        
-        
+
+
         return importSymbols;
     }
-    
+
     protected ExportSymbol[] getExportSymbolsFromGhidra() {
         ArrayList<ExportSymbol> exportSymbolList = new ArrayList<ExportSymbol>();
 
@@ -478,75 +479,75 @@ public class GhidraBinaryContext extends BinaryContext{
         return exportSymbols;
     }
 
-    
+
     public String getLanguageIDFromGhidra()
 	{
-		
+
 		return theCurrentProgram.getLanguageID().getIdAsString();
 	}
-    
+
     public DisassemblerType getDisassemblyType()
     {
     	return theDisassemblerType;
     }
-    
+
     public String getBinaryNameFromGhidra()
 	{
 		return theCurrentProgram.getName();
 	}
-	
+
 	public String getBinarySHA256FromGhidra()
 	{
 		return theCurrentProgram.getExecutableSHA256();
 	}
-	
+
 	public WordSize getWordSizeFromGhidra()
-	{				
+	{
 		return getWordSize(theCurrentProgram);
 	}
-	
+
 	public static WordSize  getWordSize(Program program)
 	{
 		int wordSize = program.getDefaultPointerSize();
-		
+
 		WordSize archWordSize;
-		
+
 		switch(wordSize) {
-		
+
 		case 8 : archWordSize =WordSize.BITS_64;
 		         break;
-		         
+
 		case 4 : archWordSize= WordSize.BITS_32;
 				 break;
-			
+
 		case 2 : archWordSize= WordSize.BITS_16;
 		         break;
-			
-		default: throw new RuntimeException("Unsupported word size: "+wordSize); 
-							 				
+
+		default: throw new RuntimeException("Unsupported word size: "+wordSize);
+
 		}
-		
+
 		return archWordSize;
-		
+
 	}
-	
+
 	public FileType getFileTypeFromGhidra()
 	{
 		return GhidraBinaryContext.getFileTypeFromGhidra(theCurrentProgram);
 	}
-	
+
 	public static FileType getFileTypeFromGhidra(Program program)
 	{
 		String executableFormat = program.getExecutableFormat();
-		
+
 		WordSize wordSize = GhidraBinaryContext.getWordSize(program);
-		
+
 		FileType fileType;
-		
+
 		if(executableFormat.contains("ELF") && wordSize== WordSize.BITS_64)
 		{
 			fileType = FileType.ELF64;
-			
+
 		}
 		else if (executableFormat.contains("ELF"))
 		{
@@ -555,13 +556,13 @@ public class GhidraBinaryContext extends BinaryContext{
 		else if(executableFormat.contains("PE") && wordSize== WordSize.BITS_64)
 		{
 			fileType = FileType.PE64;
-			
+
 		}
 		else if (executableFormat.contains("PE"))
 		{
 			fileType = FileType.PE32;
 		}
-		
+
 		else if (executableFormat.contains("Mach-O")  && wordSize== WordSize.BITS_32)
 		{
 			fileType = FileType.MACH_O_32;
@@ -570,26 +571,26 @@ public class GhidraBinaryContext extends BinaryContext{
 		{
 			fileType = FileType.MACH_O_64;
 		}
-				
+
 		else
 		{
-			throw new RuntimeException("Unsupported executable format: "+executableFormat); 
+			throw new RuntimeException("Unsupported executable format: "+executableFormat);
 		}
-				
-		
+
+
 		return fileType;
-		
+
 	}
-	
+
 	public ProcessorType getProcessTypeFromGhidra()
 	{
-		
-		WordSize wordSize = getWordSizeFromGhidra();			
-		
+
+		WordSize wordSize = getWordSizeFromGhidra();
+
 		String processName = theCurrentProgram.getLanguage().getProcessor().toString();
-		
+
 		ProcessorType processorType;
-		
+
 		if(processName.contains("x86") && wordSize == WordSize.BITS_32)
 		{
 			processorType = ProcessorType.x86;
@@ -612,39 +613,42 @@ public class GhidraBinaryContext extends BinaryContext{
 		}
 		else if (processName.contains("AARCH64"))
 		{
-			processorType = ProcessorType.AARCH64; 
+			processorType = ProcessorType.AARCH64;
 		}
 		else
 		{
-			throw new RuntimeException("Unsupporteds processor type: "+processName); 
+			throw new RuntimeException("Unsupporteds processor type: "+processName);
 		}
-		
+
 
 		return processorType;
-		
+
 	}
-	
+
 	public Endness getEndnessFromGhidra()
-	{		
-		
+	{
+
 		Endness endness = Endness.LITTLE_ENDIAN;
-		
+
 		if(theCurrentProgram.getLanguage().isBigEndian())
 		{
 			endness = Endness.BIG_ENDIAN;
 		}
-						
-		
+
+
 		return endness;
 	}
-	
+
 	public Path getRawBinaryFilePathFromGhidra() {
 	    String executablePath = theCurrentProgram.getExecutablePath();
 
-	    // Use Paths.get with URI-like syntax for Windows compatibility
-	    Path path = Paths.get(executablePath.startsWith("/") ? executablePath.substring(1) : executablePath);
+	    // Convert to a File to handle platform-specific path nuances
+	    File file = new File(executablePath);
 
-	    return path.normalize();
+	    // Convert File to a Path, ensuring it's platform-independent
+	    Path path = file.toPath().toAbsolutePath().normalize();
+
+	    return path;
 	}
 	
 	public long getFileSizeFromGhidra() throws IOException 
