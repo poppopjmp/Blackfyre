@@ -1,7 +1,3 @@
-Here's a revised version, formatted for the first section of a `README.md` file on GitHub, with better flow and readability:
-
----
-
 # **Blackfyre**
 
 **Blackfyre** is an open-source platform designed to standardize and streamline binary analysis. It provides tools and APIs for extracting, analyzing, and storing binary data in a disassembler-agnostic and architecture-agnostic format. This enables consistent workflows for advanced reverse engineering tasks powered by AI/ML, NLP, and LLMs.
