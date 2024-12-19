@@ -310,10 +310,29 @@ The **Blackfyre Ghidra Plugin** enables streamlined extraction of binary data in
    - Using a plugin version that does not match your Ghidra version may result in compatibility issues or errors. If you are unsure, verify the required Ghidra version in the plugin release notes.
    - If you encounter any issues during installation or usage, refer to the plugin's documentation or open an issue in the Blackfyre repository.
 
----
-
 ### Building the Ghidra Plugin
-_How to for  building the Ghidra Plugin is coming soon......._
+
+The Ghidra plugin requires a specific version of `protobuf-java`. For **Blackfyre v1.0.0**, the required version is **3.25.1**. Follow these steps to ensure you have the correct dependency:
+
+#### 1. **Download the Required JAR File**
+
+You can find the specific `protobuf-java` JAR file needed for your Blackfyre version in the [Releases section](https://github.com/kye4u2/Blackfyre/releases). For **Blackfyre v1.0.0**, download `protobuf-java-3.25.1.jar` from the following URL:
+
+```bash
+wget https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar
+```
+
+#### 2. **Place the JAR File**
+
+Place the downloaded JAR file in the appropriate location required by the plugin’s build system. Typically, this would involve placing it in a `libs` directory or configuring your build script (e.g., `build.gradle` or `pom.xml`) to reference the file.
+
+#### 3. **Build the Ghidra Plugin**
+
+Ensure all required dependencies are correctly set up. Detailed instructions for building the Ghidra plugin will be provided in the repository documentation.
+
+#### Notes:
+- Using an incorrect version of `protobuf-java` may result in build errors or runtime issues. Ensure you use version **3.25.1** for **Blackfyre v1.0.0**.
+- If you upgrade to a newer version of Blackfyre in the future, refer to the release notes to confirm the required version of `protobuf-java`.
 
 ## Contributing
 
