@@ -638,9 +638,13 @@ public class GhidraBinaryContext extends BinaryContext{
 		return endness;
 	}
 	
-	public Path getRawBinaryFilePathFromGhidra()
-	{
-		return Paths.get(theCurrentProgram.getExecutablePath());
+	public Path getRawBinaryFilePathFromGhidra() {
+	    String executablePath = theCurrentProgram.getExecutablePath();
+
+	    // Use Paths.get with URI-like syntax for Windows compatibility
+	    Path path = Paths.get(executablePath.startsWith("/") ? executablePath.substring(1) : executablePath);
+
+	    return path.normalize();
 	}
 	
 	public long getFileSizeFromGhidra() throws IOException 
