@@ -1,11 +1,30 @@
-# Blackfyre
+Here's a revised version, formatted for the first section of a `README.md` file on GitHub, with better flow and readability:
 
-**Blackfyre** is an open-source platform designed to standardize and streamline binary analysis. It offers tools and APIs for extracting, analyzing, and storing binary data in a disassembler-agnostic and architecture-agnostic manner, enabling consistent workflows for advanced tasks in reverse engineering that leverage AI/ML, NLP, and LLMs
-## What is Blackfyre?
+---
+
+# **Blackfyre**
+
+**Blackfyre** is an open-source platform designed to standardize and streamline binary analysis. It provides tools and APIs for extracting, analyzing, and storing binary data in a disassembler-agnostic and architecture-agnostic format. This enables consistent workflows for advanced reverse engineering tasks powered by AI/ML, NLP, and LLMs.
+
+---
+
+### **Origin and Purpose**
+
+Blackfyre was originally developed to support the course **"Automating Reverse Engineering Processes with AI/ML, NLP, and LLMs"** at **Blackhat** (since 2019) and **RECON** (since 2023). The platform was created to demonstrate and teach cutting-edge techniques for automating reverse engineering workflows using advanced machine learning and natural language processing tools. Today, Blackfyre continues to empower developers and researchers with a robust framework for integrating AI-driven workflows into reverse engineering.
+
+---
+
+### **What is Blackfyre?**
 
 Blackfyre consists of two core components:
-1. **Disassembler Plugins**: Extract structured data and metadata from binaries and save them in the **Binary Context Container (BCC)** format. This ensures compatibility and standardization for subsequent analysis across different tools.
-2. **Python Library**: Provides APIs for working with BCC files, including analysis of binary data, functions, basic blocks, instructions, and their relationships.
+
+1. **Disassembler Plugins**  
+   Extract structured data and metadata from binaries and save them in the **Binary Context Container (BCC)** format. This ensures compatibility and standardization for subsequent analysis across different tools and architectures.
+
+2. **Python Library**  
+   Provides APIs for working with BCC files, enabling detailed analysis of binary data, including functions, basic blocks, instructions, and their relationships. These APIs are designed to integrate seamlessly into workflows that leverage AI/ML and NLP techniques for advanced binary analysis.
+
+---
 
 ### Integration with PyVEX and Vex IR
 
@@ -15,7 +34,6 @@ A key feature of Blackfyre is its integration with **pyvex**, a library for lift
 By leveraging pyvex, Blackfyre supports analysis for the following architectures:
 - **x86 (32-bit and 64-bit)**
 - **ARM (32-bit and 64-bit)**
-- **AArch64**
 - **MIPS (32-bit and 64-bit)**
 - **PowerPC (32-bit and 64-bit)**
 
