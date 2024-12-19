@@ -64,9 +64,14 @@ This architecture coverage ensures Blackfyre can be applied to a wide range of b
 - Ghidra (optional, for Ghidra Plugin)
 
 ### Installing the Blackfyre Python Library
+
+Blackfyre relies on pyvex, which has a straightforward installation process via pip on x86_64/AMD64 architectures. 
+However, installation on ARM-based architectures (e.g., Mac M1/M2) can be more complex and may require additional troubleshooting.
+
+#### Steps for Installation:
 1. Clone the Blackfyre repository:
    ```sh
-   git clone https://github.com/kye4u2/Blackfyre
+   git clone https://github.com/jonescyber-ai/Blackfyre.git
    cd Blackfyre
    ```
 
@@ -75,11 +80,30 @@ This architecture coverage ensures Blackfyre can be applied to a wide range of b
    cd src/python
    pip install -e .
    ```
-3. Verify the install by running the example python script:
+   
+3. **Resolve pyvex installation issues (if applicable)**:
+   - For x86_64/AMD64 systems:
+     - `pyvex` should install without issues using `pip`, as it has prebuilt wheels for these architectures.
+   - For ARM-based systems (e.g., Mac M1/M2):
+     - Installation can be more challenging. A potential workaround is:
+       - Use the [Anaconda distribution](https://www.anaconda.com/) to create a virtual environment.
+       - Install `pyvex` and its dependencies manually within this environment.
+     - There is no guarantee this workaround will work and additional troubleshooting may still be required.
+3. Go back to the root directory:
+   ```sh
+   cd ../../
+   ```   
+
+4. Verify the install by running the example python script:
    ```sh
     python examples/python/example_displaying_binary_metadata.py
     ```
    If the script runs without errors, the installation was successful.
+
+#### Additional Notes:
+- On x86_64/AMD64 systems, the installation process for `Blackfyre` is typically smooth due to the availability of prebuilt binaries for `pyvex`.
+- On ARM-based systems, some dependencies might need to be built from source, which can require additional configuration.
+- If you encounter errors or need further assistance, refer to the `pyvex` GitHub repository or community forums for guidance.
 
 ---
 
@@ -263,10 +287,33 @@ The **Blackfyre Ghidra Plugin** enables streamlined extraction of binary data in
 - **Consistent Output**: Ensures data is captured in the standardized BCC format.
 - **Extensibility**: Additional plugins can be written for other disassemblers like **IDA Pro** and **Binary Ninja**.
 
-### Installation and Usage
-*  The latest  ghidra_*.zip plugin can be found in the most release  in the release section of the Blackfyre repository.
-* Note the plugin is tied to the version of Ghidra that was used to build the plugin.
+### Installation and Usage of the Ghidra Plugin
+
+1. **Download the Plugin**:
+   - Locate the latest `ghidra_*.zip` plugin file in the [Releases section](https://github.com/jonescyber-ai/Blackfyre/releases) of the Blackfyre repository.
+   - Ensure you select the plugin version that matches the version of Ghidra you are using, as the plugin is tied to the specific Ghidra version it was built for.
+
+2. **Install the Plugin in Ghidra**:
+   - Open Ghidra and navigate to **File > Install Extensions**.
+   - In the **Install Extensions** dialog:
+     - Click on the "Plus" icon to add a new extension.
+     - Browse to the location of the downloaded `ghidra_*.zip` file.
+     - Select the file and click **OK**.
+   - After installation, restart Ghidra for the plugin to be fully loaded.
+
+3. **Verify Installation**:
+   - After restarting Ghidra, check if the plugin's functionality is accessible:
+     - Navigate to the menu or toolbar where the plugin features are expected to appear.
+     - Refer to the plugin documentation (if available) for specific usage instructions.
+
+4. **Notes**:
+   - Using a plugin version that does not match your Ghidra version may result in compatibility issues or errors. If you are unsure, verify the required Ghidra version in the plugin release notes.
+   - If you encounter any issues during installation or usage, refer to the plugin's documentation or open an issue in the Blackfyre repository.
+
 ---
+
+### Building the Ghidra Plugin
+_How to for  building the Ghidra Plugin is coming soon......._
 
 ## Contributing
 
