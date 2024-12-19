@@ -310,6 +310,22 @@ The **Blackfyre Ghidra Plugin** enables streamlined extraction of binary data in
    - Using a plugin version that does not match your Ghidra version may result in compatibility issues or errors. If you are unsure, verify the required Ghidra version in the plugin release notes.
    - If you encounter any issues during installation or usage, refer to the plugin's documentation or open an issue in the Blackfyre repository.
 
+### **Using Ghidra in Headless Mode**
+
+Ghidra supports running scripts and performing automated tasks in headless mode. This is particularly useful for batch processing or when a graphical user interface (GUI) is not required.
+
+#### **Headless Mode Overview**
+- The headless mode is executed using the `analyzeHeadless` script provided in the Ghidra installation under the `support` directory.
+- You can use this mode to import binaries, run scripts, delete projects, and more.
+
+#### **Examples Provided**
+This repository includes example scripts for running Ghidra in headless mode:
+
+- **Linux**: `example_generate_bcc_headless.sh`
+- **Windows**: `example_generate_bcc_headless.bat`
+
+These scripts demonstrate how to configure and execute Ghidra's headless mode for generating the binary context container (BCC) using the `GenerateBinaryContext.java` script.
+
 ### Building the Ghidra Plugin
 
 The Ghidra plugin requires a specific version of `protobuf-java`. For **Blackfyre v1.0.0**, the required version is **3.25.1**. Follow these steps to ensure you have the correct dependency:
@@ -326,9 +342,19 @@ wget https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.25.1/pro
 
 Place the downloaded JAR file in the appropriate location required by the plugin’s build system. Typically, this would involve placing it in a `libs` directory or configuring your build script (e.g., `build.gradle` or `pom.xml`) to reference the file.
 
-#### 3. **Build the Ghidra Plugin**
+#### **Step 3: Build the Ghidra Plugin**
 
-Ensure all required dependencies are correctly set up. Detailed instructions for building the Ghidra plugin will be provided in the repository documentation.
+Before building the Ghidra plugin, ensure all required dependencies, including the correct version of `protobuf-java`, are set up properly.
+
+If you are new to building Ghidra extensions, refer to the following resources for detailed guidance:
+- **[GhidraDev Plugin README](https://github.com/NationalSecurityAgency/ghidra/blob/master/GhidraBuild/EclipsePlugins/GhidraDev/GhidraDevPlugin/README.md)**: Learn how to configure and use the GhidraDev plugin for developing and building extensions.
+- **[Ghidra Advanced Development Guide](https://github.com/NationalSecurityAgency/ghidra/blob/master/GhidraDocs/GhidraClass/AdvancedDevelopment/GhidraAdvancedDevelopment_withNotes.html)**: A comprehensive tutorial on advanced Ghidra extension development.
+
+Once your development environment is set up:
+1. Compile the plugin using the GhidraDev plugin for Eclipse, the officially supported development environment for creating and building Ghidra extensions. 
+2. Ensure your Eclipse IDE is properly configured with the GhidraDev plugin and all necessary dependencies are in place.
+3. Verify the build output to ensure no errors or missing dependencies.
+4. Deploy and test the plugin within your Ghidra environment.
 
 #### Notes:
 - Using an incorrect version of `protobuf-java` may result in build errors or runtime issues. Ensure you use version **3.25.1** for **Blackfyre v1.0.0**.
