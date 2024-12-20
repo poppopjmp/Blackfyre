@@ -301,11 +301,11 @@ The **Blackfyre Ghidra Plugin** enables streamlined extraction of binary data in
 - **Consistent Output**: Ensures data is captured in the standardized BCC format.
 - **Extensibility**: Additional plugins can be written for other disassemblers like **IDA Pro** and **Binary Ninja**.
 
-### Installation and Usage of the Ghidra Plugin
+### **Installation and Usage of the Ghidra Plugin**
 
 1. **Download the Plugin**:
    - Locate the latest `ghidra_*.zip` plugin file in the [Releases section](https://github.com/jonescyber-ai/Blackfyre/releases) of the Blackfyre repository.
-   - Ensure you select the plugin version that matches the version of Ghidra you are using, as the plugin is tied to the specific Ghidra version it was built for.
+   - Ensure you select the plugin version that matches your Ghidra version, as the plugin is tied to the specific Ghidra version it was built for.
 
 2. **Install the Plugin in Ghidra**:
    - Open Ghidra and navigate to **File > Install Extensions**.
@@ -315,14 +315,26 @@ The **Blackfyre Ghidra Plugin** enables streamlined extraction of binary data in
      - Select the file and click **OK**.
    - After installation, restart Ghidra for the plugin to be fully loaded.
 
-3. **Verify Installation**:
-   - After restarting Ghidra, check if the plugin's functionality is accessible:
-     - Navigate to the menu or toolbar where the plugin features are expected to appear.
-     - Refer to the plugin documentation (if available) for specific usage instructions.
+3. **Run the Ghidra Script to Generate the BCC**:
+   - Open the binary you want to analyze in Ghidra.
+   - Navigate to **Script Manager** from the **Window** menu or toolbar.
+   - Locate and run the script `GenerateBinaryContext.java`.
+   - During execution, the script will prompt you for the following inputs:
+     - **Output Directory**: Specify where the `.bcc` file should be saved.
+     - **Include Raw Binary**: Indicate whether to include the raw binary in the `.bcc` file. Including it will increase the file size.
+     - **Include Decompiled Code**: Specify if decompiled code should be included. Note that decompilation will add processing time, and in the worst case, the time will scale as `timeout × number of functions`.
+     - **Decompilation Timeout**: Enter the timeout value for decompiling each function, if applicable. If decompiled code is not needed, set this option to "No" to avoid delays.
 
-4. **Notes**:
-   - Using a plugin version that does not match your Ghidra version may result in compatibility issues or errors. If you are unsure, verify the required Ghidra version in the plugin release notes.
-   - If you encounter any issues during installation or usage, refer to the plugin's documentation or open an issue in the Blackfyre repository.
+4. **Verify Installation and Output**:
+   - After running the script, verify that the `.bcc` file has been generated in the specified output directory.
+   - Check the content of the `.bcc` file to ensure it includes the selected components (e.g., raw binary or decompiled code).
+   - If any errors occur during script execution, refer to the error messages for troubleshooting.
+
+5. **Notes**:
+   - Always use a plugin version compatible with your Ghidra version to avoid compatibility issues.
+   - Excluding decompiled code can significantly reduce processing time, especially for binaries with a large number of functions.
+   - If you encounter issues during installation or script execution, refer to the plugin documentation _(if available)_ or open an issue in the Blackfyre repository.
+
 
 ### **Using Ghidra in Headless Mode**
 
@@ -346,7 +358,7 @@ The Ghidra plugin requires a specific version of `protobuf-java`. For **Blackfyr
 
 #### 1. **Download the Required JAR File**
 
-You can find the specific `protobuf-java` JAR file needed for your Blackfyre version in the [Releases section](https://github.com/kye4u2/Blackfyre/releases). For **Blackfyre v1.0.0**, download `protobuf-java-3.25.1.jar` from the following URL:
+You can find the specific `protobuf-java` JAR file needed for your Blackfyre version in the [Releases section](https://github.com/jonescyber-ai/Blackfyre/releases). For **Blackfyre v1.0.0**, download `protobuf-java-3.25.1.jar` from the following URL:
 
 ```bash
 wget https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar
