@@ -301,7 +301,7 @@ The **Blackfyre Ghidra Plugin** enables streamlined extraction of binary data in
 - **Consistent Output**: Ensures data is captured in the standardized BCC format.
 - **Extensibility**: Additional plugins can be written for other disassemblers like **IDA Pro** and **Binary Ninja**.
 
-### **Installation and Usage of the Ghidra Plugin**
+### **Installation and Usage of the Ghidra Plugin **
 
 1. **Download the Plugin**:
    - Locate the latest `ghidra_*.zip` plugin file in the [Releases section](https://github.com/jonescyber-ai/Blackfyre/releases) of the Blackfyre repository.
@@ -354,37 +354,66 @@ These scripts demonstrate how to configure and execute Ghidra's headless mode fo
 
 ### Building the Ghidra Plugin
 
-The Ghidra plugin requires a specific version of `protobuf-java`. For **Blackfyre v1.0.0**, the required version is **3.25.1**. Follow these steps to ensure you have the correct dependency:
+The Ghidra plugin for **Blackfyre v1.0.0** relies on the `protobuf-java` dependency, which is already specified in the `build.gradle` file. This guide explains how to build the plugin using either Gradle or Eclipse GhidraDev.
 
-#### 1. **Download the Required JAR File**
 
-You can find the specific `protobuf-java` JAR file needed for your Blackfyre version in the [Releases section](https://github.com/jonescyber-ai/Blackfyre/releases). For **Blackfyre v1.0.0**, download `protobuf-java-3.25.1.jar` from the following URL:
+#### Prerequisites
 
-```bash
-wget https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar
-```
+1. **Ghidra Installation**  
+   Ensure that Ghidra is installed on your system. For this guide, we use **Ghidra 11.2.1** as an example.
 
-#### 2. **Place the JAR File**
+2. **Gradle Version**  
+   - **Ghidra 11.2.1** requires **Gradle 8.5** to build plugins.  
+   - If using a different version of Ghidra, refer to the [release notes](https://github.com/NationalSecurityAgency/ghidra/releases) for the correct Gradle version.
 
-Place the downloaded JAR file in the appropriate location required by the plugin’s build system. Typically, this would involve placing it in a `libs` directory or configuring your build script (e.g., `build.gradle` or `pom.xml`) to reference the file.
+3. **Set `GHIDRA_INSTALL_DIR`**  
+   The `GHIDRA_INSTALL_DIR` environment variable must point to your Ghidra installation directory. You can set it inline or as a persistent environment variable.
 
-#### **Step 3: Build the Ghidra Plugin**
+---
 
-Before building the Ghidra plugin, ensure all required dependencies, including the correct version of `protobuf-java`, are set up properly.
+#### Building with Gradle (Recommended)
 
-If you are new to building Ghidra extensions, refer to the following resources for detailed guidance:
-- **[GhidraDev Plugin README](https://github.com/NationalSecurityAgency/ghidra/blob/master/GhidraBuild/EclipsePlugins/GhidraDev/GhidraDevPlugin/README.md)**: Learn how to configure and use the GhidraDev plugin for developing and building extensions.
-- **[Ghidra Advanced Development Guide](https://github.com/NationalSecurityAgency/ghidra/blob/master/GhidraDocs/GhidraClass/AdvancedDevelopment/GhidraAdvancedDevelopment_withNotes.html)**: A comprehensive tutorial on advanced Ghidra extension development.
+1. **Run the Gradle Build Command**  
+   Navigate to the plugin's source directory and use the following command to build the plugin, where the build.gradle should be there. Replace `/path/to/ghidra/install/path` with the actual path to your Ghidra installation:
 
-Once your development environment is set up:
-1. Compile the plugin using the GhidraDev plugin for Eclipse, the officially supported development environment for creating and building Ghidra extensions. 
-2. Ensure your Eclipse IDE is properly configured with the GhidraDev plugin and all necessary dependencies are in place.
-3. Verify the build output to ensure no errors or missing dependencies.
-4. Deploy and test the plugin within your Ghidra environment.
+   ```bash
+   GHIDRA_INSTALL_DIR=/path/to/ghidra/install/path gradle
+   ```
 
-#### Notes:
-- Using an incorrect version of `protobuf-java` may result in build errors or runtime issues. Ensure you use version **3.25.1** for **Blackfyre v1.0.0**.
-- If you upgrade to a newer version of Blackfyre in the future, refer to the release notes to confirm the required version of `protobuf-java`.
+2. **Verify the Build Output**  
+   After the build completes successfully, the compiled plugin will be available in the `dist` directory.
+
+3. **Deploy the Plugin**
+   - Launch Ghidra.
+   - Navigate to **File → Install Extensions** and enable the plugin.
+
+#### Building with Eclipse GhidraDev (Optional for Debugging)
+
+If you require debugging capabilities or a development environment, use Eclipse with the GhidraDev plugin.
+
+1. **Install GhidraDev Plugin**  
+   Follow the setup instructions in the [GhidraDev Plugin README](https://github.com/NationalSecurityAgency/ghidra/blob/master/GhidraBuild/EclipsePlugins/GhidraDev/GhidraDevPlugin/README.md).
+
+2. **Import the Project**  
+   Use the GhidraDev wizard to import the plugin project. The `build.gradle` file will manage all dependencies, including `protobuf-java`.
+
+3. **Build the Plugin**  
+   Use Eclipse’s build tools to compile the plugin. Eclipse will rely on the `build.gradle` file for dependency resolution.
+
+4. **Test and Debug**  
+   Deploy the plugin to Ghidra and use Eclipse’s debugging tools for development and troubleshooting.
+
+#### Notes
+
+- **Gradle Dependency Management**:  
+  The required dependency (`protobuf-java v3.25.1`) is already configured in the `build.gradle` file.
+
+- **Gradle Version Compatibility**:  
+  - Use **Gradle 8.5** for **Ghidra 11.2.1**.  
+  - If using a different version of Ghidra, confirm the required Gradle version in the [Ghidra release notes](https://github.com/NationalSecurityAgency/ghidra/releases).
+
+- **Debugging with GhidraDev**:  
+  Eclipse GhidraDev is recommended if you require enhanced debugging or development tools.
 
 ## Contributing
 

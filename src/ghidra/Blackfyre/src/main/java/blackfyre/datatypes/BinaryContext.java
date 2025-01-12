@@ -24,7 +24,7 @@ import ghidra.program.model.listing.FunctionManager;
 
 public class BinaryContext {
 
-	final String BCC_VERSION = "1.0";
+	final String BCC_VERSION = "1.0.1";
 
     final int MAX_BINARY_NAME_LENGTH = 100;
 
