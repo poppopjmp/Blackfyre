@@ -65,105 +65,71 @@ public class GhidraBinaryContext extends BinaryContext{
 
     public boolean initialize() throws Exception
     {
+
         if(theIsInitialized)
         {
             return theIsInitialized;
         }
-        
-        try {
-            // Set binary name and hash
-            theName = getBinaryNameFromGhidra();
-            theSHA256Hash = getBinarySHA256FromGhidra();
-            
-            // Set processor type, file type, and word size
-            theProcType = determineProcTypeFromGhidra();
-            theFileType = determineFileTypeFromGhidra();
-            theWordSize = determineWordSizeFromGhidra();
-            theEndness = determineEndnessFromGhidra();
-            
-            // Set version information
-            theDisassemblerType = getDisassemblyType();
-            theDisassemblerVersion = theCurrentProgram.getCompilerSpec().getCompilerSpecID().toString();
-            
-            // Initialize PE header if applicable
-            initializeHeader();
-            
-            // Get binary metadata
-            theTotalFunctions = theCurrentProgram.getFunctionManager().getFunctionCount();
-            theTotalInstructions = getTotalInstructionsFromGhidra();
-            theFileSize = theCurrentProgram.getMemory().getSize();
-            
-            // Extract imports, exports, defined data, and strings
-            theImportSymbols = getImportSymbolsFromGhidra();
-            theExportSymbols = getExportSymbolsFromGhidra();
-            theDefinedDataMap = getDefinedDataRefsFromGhidra();
-            theStringRefs = getStringRefsFromGhidra();
-            
-            // Extract function contexts
-            theFunctionContexts = getDisassemblyFunctionListFromGhidra();
-            
-            // Build call graphs
-            theCallerToCalleesMap = getCallerToCalleesMap();
-            theCalleeToCallersMap = getCalleeToCallersMapFromGhidra();
-            
-            theIsInitialized = true;
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error initializing GhidraBinaryContext: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    private ProcessorType determineProcTypeFromGhidra() {
-        String languageId = theCurrentProgram.getLanguageID().getIdAsString().toLowerCase();
-        
-        if (languageId.contains("x86")) {
-            if (theCurrentProgram.getAddressFactory().getDefaultAddressSpace().getSize() == 64) {
-                return ProcessorType.x86_64;
-            } else {
-                return ProcessorType.x86;
-            }
-        } else if (languageId.contains("arm")) {
-            if (languageId.contains("64")) {
-                return ProcessorType.AARCH64;
-            } else {
-                return ProcessorType.ARM;
-            }
-        } else if (languageId.contains("ppc")) {
-            return ProcessorType.PPC;
-        } else if (languageId.contains("mips")) {
-            return ProcessorType.MIPS;
-        }
-        
-        // Default to x86 if unknown
-        return ProcessorType.x86;
-    }
-    
-    private FileType determineFileTypeFromGhidra() {
-        String executableFormat = theCurrentProgram.getExecutableFormat().toLowerCase();
-        int addressSize = theCurrentProgram.getAddressFactory().getDefaultAddressSpace().getSize();
-        
-        if (executableFormat.contains("pe")) {
-            return (addressSize == 64) ? FileType.PE64 : FileType.PE32;
-        } else if (executableFormat.contains("elf")) {
-            return (addressSize == 64) ? FileType.ELF64 : FileType.ELF32;
-        } else if (executableFormat.contains("macho")) {
-            return (addressSize == 64) ? FileType.MACH_O_64 : FileType.MACH_O_32;
-        }
-        
-        // Default to PE32 if unknown
-        return FileType.PE32;
-    }
-    
-    private WordSize determineWordSizeFromGhidra() {
-        int addressSize = theCurrentProgram.getAddressFactory().getDefaultAddressSpace().getSize();
-        return (addressSize == 64) ? WordSize.BITS_64 : WordSize.BITS_32;
-    }
-    
-    private Endness determineEndnessFromGhidra() {
-        boolean isBigEndian = theCurrentProgram.getLanguage().isBigEndian();
-        return isBigEndian ? Endness.BIG_ENDIAN : Endness.LITTLE_ENDIAN;
+
+        // Binary Name
+ 		theName = getBinaryNameFromGhidra();
+
+//     	    // Binary Sha256
+     	theSHA256Hash = getBinarySHA256FromGhidra();
+
+//     		//Word size
+     	theWordSize = getWordSizeFromGhidra();
+
+
+ 		// File Type
+ 		theFileType  = getFileTypeFromGhidra();
+
+
+ 		// Processor Type
+ 		theProcType = getProcessTypeFromGhidra();
+
+ 		// Endness
+ 		theEndness = getEndnessFromGhidra();
+
+
+
+ 		theLanguageID = getLanguageIDFromGhidra();
+
+        theStringRefs = getStringRefsFromGhidra();
+
+        theImportSymbols = getImportSymbolsFromGhidra();
+
+        theFunctionContexts = getDisassemblyFunctionListFromGhidra();
+
+        theTotalFunctions =theFunctionContexts.length;
+
+        theTotalInstructions = getTotalInstructionsFromGhidra();
+
+
+        theDisassemblerType = DisassemblerType.Ghidra;
+
+        theCalleeToCallersMap = getCalleeToCallersMapFromGhidra();
+
+        theCallerToCalleesMap = getCallerToCalleesMap();
+
+        theRawBinaryFilePath = getRawBinaryFilePathFromGhidra();
+
+        theDefinedDataMap = getDefinedDataRefsFromGhidra();
+
+        theExportSymbols = getExportSymbolsFromGhidra();
+
+        theFileSize = getFileSizeFromGhidra();
+
+        theDisassemblerVersion = getDisassemblerVersionFromGhida();
+
+
+        initializeHeader();
+
+
+
+        theIsInitialized = true;
+
+        return theIsInitialized;
     }
 
     protected void initializeHeader() throws Exception

@@ -47,23 +47,6 @@ public class BasicBlockContext {
 		
 		basicBlockContext.setProcType(theProcType.getNumVal());
 		
-		// Add incoming edges
-		if (theIncomingEdges != null) {
-			for (long edge : theIncomingEdges) {
-				basicBlockContext.addIncomingEdges(edge);
-			}
-		}
-		
-		// Add outgoing edges
-		if (theOutgoingEdges != null) {
-			for (long edge : theOutgoingEdges) {
-				basicBlockContext.addOutgoingEdges(edge);
-			}
-		}
-		
-		// Set has call flag
-		basicBlockContext.setHasCall(theHasCall);
-		
 		for( InstructionContext instructionContext : theInstructionContexts)
 		{
 			//Get the function protobuff object
@@ -74,12 +57,10 @@ public class BasicBlockContext {
 						
 		}
 				
+
+		
 		return basicBlockContext.build();
 		
 	}
-	
-	// Additional fields
-	protected long[] theIncomingEdges;
-	protected long[] theOutgoingEdges;
-	protected boolean theHasCall;
+
 }

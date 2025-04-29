@@ -1,9 +1,9 @@
 package blackfyre.datatypes;
 
 public enum Endness {
-    
-    LITTLE_ENDIAN(1), BIG_ENDIAN(2);
-    
+
+    BIG_ENDIAN(1), LITTLE_ENDIAN(2);
+
     private int numVal;
 
     Endness(int numVal) {
@@ -13,4 +13,5 @@ public enum Endness {
     public int getNumVal() {
         return numVal;
     }
+
 }

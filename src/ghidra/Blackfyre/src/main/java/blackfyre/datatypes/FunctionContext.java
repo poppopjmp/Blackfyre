@@ -1,7 +1,6 @@
 package blackfyre.datatypes;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 
 import blackfyre.protobuf.FunctionContextOuterClass;
 import ghidra.util.datastruct.ByteArray;
@@ -140,32 +139,6 @@ public class FunctionContext {
 		
 		functionContextBuilder.setDecompiledCode(theDecompiledCode);
 		
-		// Add the new fields
-		
-		// Add caller addresses
-		if (theCallerAddresses != null) {
-			for (long address : theCallerAddresses) {
-				functionContextBuilder.addCallerAddresses(address);
-			}
-		}
-		
-		// Add callee addresses
-		if (theCalleeAddresses != null) {
-			for (long address : theCalleeAddresses) {
-				functionContextBuilder.addCalleeAddresses(address);
-			}
-		}
-		
-		// Add analysis flags
-		if (theCallingConvention != null) {
-			functionContextBuilder.putAnalysisMetadata("calling_convention", theCallingConvention);
-		}
-		
-		functionContextBuilder.putAnalysisMetadata("stack_frame_size", String.valueOf(theStackFrameSize));
-		functionContextBuilder.putAnalysisFlags("is_library", theIsLibrary);
-		functionContextBuilder.putAnalysisFlags("has_loops", theHasLoops);
-		
-		// Add basic blocks
 		for( BasicBlockContext basicBlockContext : theBasicBlockContexts)
 		{
 			//Get the function protobuff object
