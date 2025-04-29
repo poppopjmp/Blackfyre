@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
 import blackfyre.datatypes.BinaryContext;
 import blackfyre.datatypes.DataType;
@@ -538,49 +539,96 @@ public class GhidraBinaryContext extends BinaryContext{
 
 	public static FileType getFileTypeFromGhidra(Program program)
 	{
-		String executableFormat = program.getExecutableFormat();
+    String executableFormat = program.getExecutableFormat();
+    WordSize wordSize = GhidraBinaryContext.getWordSize(program);
+    FileType fileType;
 
-		WordSize wordSize = GhidraBinaryContext.getWordSize(program);
+    if(executableFormat.contains("ELF") && wordSize== WordSize.BITS_64)
+    {
+        fileType = FileType.ELF64;
+    }
+    else if (executableFormat.contains("ELF"))
+    {
+        fileType = FileType.ELF32;
+    }
+    else if(executableFormat.contains("PE") && wordSize== WordSize.BITS_64)
+    {
+        fileType = FileType.PE64;
+    }
+    else if (executableFormat.contains("PE"))
+    {
+        fileType = FileType.PE32;
+    }
+    else if (executableFormat.contains("Mach-O")  && wordSize== WordSize.BITS_32)
+    {
+        fileType = FileType.MACH_O_32;
+    }
+    else if (executableFormat.contains("Mach-O")  && wordSize== WordSize.BITS_64)
+    {
+        fileType = FileType.MACH_O_64;
+    }
+    else if (isAPKFile(program))
+    {
+        fileType = FileType.APK;
+    }
+    else if (isFirmwareFile(program))
+    {
+        fileType = FileType.FIRMWARE;
+    }
+    else
+    {
+        throw new RuntimeException("Unsupported executable format: "+executableFormat);
+    }
 
-		FileType fileType;
+    return fileType;
+}
 
-		if(executableFormat.contains("ELF") && wordSize== WordSize.BITS_64)
-		{
-			fileType = FileType.ELF64;
+private static boolean isAPKFile(Program program) {
+    // Check if the file path ends with .apk
+    String executablePath = program.getExecutablePath();
+    if (executablePath != null && executablePath.toLowerCase().endsWith(".apk")) {
+        return true;
+    }
+    
+    // Check if specific APK-related properties exist
+    ProgramInfo programInfo = program.getProgramInfo();
+    if (programInfo != null) {
+        Properties props = programInfo.getProperties();
+        if (props != null && props.containsKey("ANDROID_PACKAGE")) {
+            return true;
+        }
+    }
+    
+    return false;
+}
 
-		}
-		else if (executableFormat.contains("ELF"))
-		{
-			fileType = FileType.ELF32;
-		}
-		else if(executableFormat.contains("PE") && wordSize== WordSize.BITS_64)
-		{
-			fileType = FileType.PE64;
-
-		}
-		else if (executableFormat.contains("PE"))
-		{
-			fileType = FileType.PE32;
-		}
-
-		else if (executableFormat.contains("Mach-O")  && wordSize== WordSize.BITS_32)
-		{
-			fileType = FileType.MACH_O_32;
-		}
-		else if (executableFormat.contains("Mach-O")  && wordSize== WordSize.BITS_64)
-		{
-			fileType = FileType.MACH_O_64;
-		}
-
-		else
-		{
-			throw new RuntimeException("Unsupported executable format: "+executableFormat);
-		}
-
-
-		return fileType;
-
-	}
+private static boolean isFirmwareFile(Program program) {
+    // Check for firmware-related properties
+    ProgramInfo programInfo = program.getProgramInfo();
+    if (programInfo != null) {
+        Properties props = programInfo.getProperties();
+        if (props != null && 
+            (props.containsKey("FIRMWARE_TYPE") || 
+             props.containsKey("FIRMWARE") || 
+             props.containsKey("DEVICE_MODEL"))) {
+            return true;
+        }
+    }
+    
+    // Check if the executable path contains firmware-related indicators
+    String execPath = program.getExecutablePath();
+    if (execPath != null) {
+        String lowerPath = execPath.toLowerCase();
+        if (lowerPath.contains("firmware") || 
+            lowerPath.endsWith(".fw") || 
+            lowerPath.endsWith(".bin") || 
+            lowerPath.endsWith(".rom")) {
+            return true;
+        }
+    }
+    
+    return false;
+}
 
 	public ProcessorType getProcessTypeFromGhidra()
 	{

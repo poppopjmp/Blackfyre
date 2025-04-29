@@ -3,11 +3,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
 import com.google.common.io.Files;
 
 import blackfyre.datatypes.FileType;
 import blackfyre.datatypes.ghidra.GhidraBinaryContext;
+import blackfyre.datatypes.ghidra.GhidraELFBinaryContext;
+import blackfyre.datatypes.ghidra.GhidraMachOBinaryContext;
 import blackfyre.datatypes.ghidra.GhidraPEBinaryContext;
 import ghidra.app.script.GhidraScript;
 import ghidra.app.util.headless.HeadlessScript;
@@ -57,12 +58,31 @@ public class GenerateBinaryContext extends HeadlessScript {
         // Determine the file type using Ghidra
         FileType fileType = GhidraBinaryContext.getFileTypeFromGhidra(currentProgram);
 
-        // Create the appropriate GhidraBinaryContext object
+        // Create the appropriate GhidraBinaryContext object based on file type
         GhidraBinaryContext ghidraBinaryContext = null;
 
         if (fileType == FileType.PE32 || fileType == FileType.PE64) {
+            println("Detected PE file format. Creating PE Binary Context.");
             ghidraBinaryContext = new GhidraPEBinaryContext(currentProgram, monitor, includeDecompiledCode, decompileTimeoutSeconds);
-        } else {
+        } 
+        else if (fileType == FileType.ELF32 || fileType == FileType.ELF64) {
+            println("Detected ELF file format. Creating ELF Binary Context.");
+            ghidraBinaryContext = new GhidraELFBinaryContext(currentProgram, monitor, includeDecompiledCode, decompileTimeoutSeconds);
+        } 
+        else if (fileType == FileType.MACH_O_32 || fileType == FileType.MACH_O_64) {
+            println("Detected Mach-O file format. Creating Mach-O Binary Context.");
+            ghidraBinaryContext = new GhidraMachOBinaryContext(currentProgram, monitor, includeDecompiledCode, decompileTimeoutSeconds);
+        }
+else if (fileType == FileType.APK) {
+    println("Detected APK file format. Creating APK Binary Context.");
+    ghidraBinaryContext = new GhidraAPKBinaryContext(currentProgram, monitor, includeDecompiledCode, decompileTimeoutSeconds);
+}
+else if (fileType == FileType.FIRMWARE) {
+    println("Detected Firmware file format. Creating Firmware Binary Context.");
+    ghidraBinaryContext = new GhidraFirmwareBinaryContext(currentProgram, monitor, includeDecompiledCode, decompileTimeoutSeconds);
+} 
+        else {
+            println("Using generic Binary Context for file type: " + fileType);
             ghidraBinaryContext = new GhidraBinaryContext(currentProgram, monitor, includeDecompiledCode, decompileTimeoutSeconds);
         }
 
