@@ -4,21 +4,21 @@ import ghidra.program.model.listing.Program;
 import ghidra.util.task.TaskMonitor;
 
 /**
- * Represents a firmware binary context in Ghidra
+ * Firmware-specific binary context implementation.
  */
 public class GhidraFirmwareBinaryContext extends GhidraBinaryContext {
     
     /**
-     * Constructor for GhidraFirmwareBinaryContext
+     * Constructor for GhidraFirmwareBinaryContext.
      *
      * @param program The Ghidra program object
-     * @param monitor The task monitor for tracking progress
-     * @param includeDecompiledCode Whether to include decompiled code
+     * @param monitor TaskMonitor for progress reporting
+     * @param includeDecompiledCode Whether to include decompiled code in the context
      * @param decompileTimeoutSeconds Timeout for decompilation operations
      */
     public GhidraFirmwareBinaryContext(Program program, TaskMonitor monitor, boolean includeDecompiledCode, int decompileTimeoutSeconds) {
         super(program, monitor, includeDecompiledCode, decompileTimeoutSeconds);
     }
     
-    // Additional firmware-specific methods would go here
+    // Firmware-specific functionality would be implemented here
 }

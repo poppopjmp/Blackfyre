@@ -1,7 +1,7 @@
 package blackfyre.datatypes;
 
 /**
- * Enum representing supported binary file types
+ * Enum representing supported binary file types.
  */
 public enum FileType {
     PE32,

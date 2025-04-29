@@ -3,31 +3,31 @@ package blackfyre.datatypes.ghidra;
 import ghidra.program.model.listing.Function;
 
 /**
- * Represents a function context in Ghidra
+ * Represents context information for a Ghidra function.
  */
 public class GhidraFunctionContext {
     private Function function;
     
     /**
-     * Constructor for GhidraFunctionContext
+     * Constructor for GhidraFunctionContext.
      *
-     * @param function The Ghidra function object
+     * @param function The Ghidra Function object
      */
     public GhidraFunctionContext(Function function) {
         this.function = function;
     }
     
     /**
-     * Gets the Ghidra function object
+     * Gets the underlying Ghidra function.
      *
-     * @return The function object
+     * @return The Ghidra function
      */
     public Function getFunction() {
         return function;
     }
     
     /**
-     * Gets the name of the function
+     * Gets the function name.
      *
      * @return The function name
      */
@@ -36,9 +36,9 @@ public class GhidraFunctionContext {
     }
     
     /**
-     * Gets the entry point address of the function as a string
+     * Gets the function entry point address.
      *
-     * @return The entry point address string
+     * @return The entry point address as a string
      */
     public String getEntryPoint() {
         return function.getEntryPoint().toString();

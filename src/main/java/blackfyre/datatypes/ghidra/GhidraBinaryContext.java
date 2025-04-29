@@ -1,14 +1,11 @@
 package blackfyre.datatypes.ghidra;
 
 import blackfyre.datatypes.FileType;
-import ghidra.app.util.bin.format.elf.ElfHeader;
-import ghidra.app.util.bin.format.macho.MachHeader;
-import ghidra.app.util.bin.format.pe.NTHeader;
 import ghidra.program.model.listing.Program;
 import ghidra.util.task.TaskMonitor;
 
 /**
- * Base class representing a binary context in Ghidra
+ * Base class for all binary context implementations in Ghidra.
  */
 public class GhidraBinaryContext {
     protected Program program;
@@ -17,11 +14,11 @@ public class GhidraBinaryContext {
     protected int decompileTimeoutSeconds;
 
     /**
-     * Constructor for GhidraBinaryContext
+     * Constructor for GhidraBinaryContext.
      *
      * @param program The Ghidra program object
-     * @param monitor The task monitor for tracking progress
-     * @param includeDecompiledCode Whether to include decompiled code
+     * @param monitor TaskMonitor for progress reporting
+     * @param includeDecompiledCode Whether to include decompiled code in the context
      * @param decompileTimeoutSeconds Timeout for decompilation operations
      */
     public GhidraBinaryContext(Program program, TaskMonitor monitor, boolean includeDecompiledCode, int decompileTimeoutSeconds) {
@@ -30,37 +27,36 @@ public class GhidraBinaryContext {
         this.includeDecompiledCode = includeDecompiledCode;
         this.decompileTimeoutSeconds = decompileTimeoutSeconds;
     }
-
+    
     /**
-     * Determines the file type from the Ghidra program
+     * Determines the file type from a Ghidra program.
      *
-     * @param program The Ghidra program object
-     * @return The detected file type
+     * @param program The Ghidra program to examine
+     * @return The detected FileType
      */
     public static FileType getFileTypeFromGhidra(Program program) {
         if (program == null) {
             return FileType.UNKNOWN;
         }
 
-        // Check for PE format
-        if (program.getOptions("Program Information").contains(NTHeader.PROGRAM_INFO)) {
-            boolean is64Bit = program.getLanguage().getLanguageDescription().getSize() == 64;
-            return is64Bit ? FileType.PE64 : FileType.PE32;
+        // Check executable format based on program properties
+        // This is a simplified implementation - actual implementation would need to
+        // examine program headers and properties in more detail
+        String format = program.getExecutableFormat();
+        if (format != null) {
+            if (format.contains("PE")) {
+                boolean is64bit = program.getDefaultPointerSize() == 8;
+                return is64bit ? FileType.PE64 : FileType.PE32;
+            } else if (format.contains("ELF")) {
+                boolean is64bit = program.getDefaultPointerSize() == 8;
+                return is64bit ? FileType.ELF64 : FileType.ELF32;
+            } else if (format.contains("Mach-O")) {
+                boolean is64bit = program.getDefaultPointerSize() == 8;
+                return is64bit ? FileType.MACH_O_64 : FileType.MACH_O_32;
+            }
         }
         
-        // Check for ELF format
-        if (program.getOptions("Program Information").contains(ElfHeader.PROGRAM_INFO)) {
-            boolean is64Bit = program.getLanguage().getLanguageDescription().getSize() == 64;
-            return is64Bit ? FileType.ELF64 : FileType.ELF32;
-        }
-        
-        // Check for Mach-O format
-        if (program.getOptions("Program Information").contains(MachHeader.PROGRAM_INFO)) {
-            boolean is64Bit = program.getLanguage().getLanguageDescription().getSize() == 64;
-            return is64Bit ? FileType.MACH_O_64 : FileType.MACH_O_32;
-        }
-
-        // Further checks could be added for other formats like APK, FIRMWARE, etc.
+        // Additional logic could be added for detecting APK and FIRMWARE formats
         
         return FileType.UNKNOWN;
     }
