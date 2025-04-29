@@ -25,13 +25,31 @@ class ExportSymbol(object):
             "Expected a protobuf object of type ExportSymbol"
         
         address = export_symbol_pb.address
-        # Fixing the attribute error by using the correct field name
-        name = export_symbol_pb.symbol_name  # Option 1
-        # OR
-        # name = export_symbol_pb.export_name  # Option 2
-        # OR
-        # name = export_symbol_pb.identifier  # Option 3
-        ordinal = export_symbol_pb.ordinal if export_symbol_pb.HasField('ordinal') else None
+        
+        # More robust handling of the name field
+        try:
+            name = getattr(export_symbol_pb, 'name')
+        except AttributeError:
+            # Fall back to other possible field names if 'name' doesn't exist
+            for possible_name in ['symbol_name', 'export_name', 'identifier', 'value']:
+                try:
+                    name = getattr(export_symbol_pb, possible_name)
+                    break
+                except AttributeError:
+                    continue
+            else:
+                raise ValueError(f"Could not find name field in ExportSymbol protobuf: {export_symbol_pb}")
+        
+        # Fix the ordinal field check
+        try:
+            # First try safe access without HasField
+            ordinal = getattr(export_symbol_pb, 'ordinal', None)
+            
+            # Check if it's a default value (0 typically indicates unset in protobuf)
+            if ordinal == 0:
+                ordinal = None
+        except AttributeError:
+            ordinal = None
         
         return cls(address, name, ordinal)
     
