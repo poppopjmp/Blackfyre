@@ -19,13 +19,18 @@ class ExportSymbol(object):
         self._ordinal = ordinal
     
     @classmethod
-    def from_pb(cls, export_symbol_pb: binary_context_pb2.ExportSymbol):
+    def from_pb(cls, export_symbol_pb):
         """Create from protobuf object"""
         assert isinstance(export_symbol_pb, binary_context_pb2.ExportSymbol), \
             "Expected a protobuf object of type ExportSymbol"
         
         address = export_symbol_pb.address
-        name = export_symbol_pb.name
+        # Fixing the attribute error by using the correct field name
+        name = export_symbol_pb.symbol_name  # Option 1
+        # OR
+        # name = export_symbol_pb.export_name  # Option 2
+        # OR
+        # name = export_symbol_pb.identifier  # Option 3
         ordinal = export_symbol_pb.ordinal if export_symbol_pb.HasField('ordinal') else None
         
         return cls(address, name, ordinal)
