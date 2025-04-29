@@ -1,0 +1,56 @@
+name: Ghidra Extension Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Get project name
+      id: project_name
+      run: |
+        # Extract project name from extension.properties or fall back to repo name
+        if [ -f src/main/resources/extension.properties ]; then
+          PROJECT_NAME=$(grep "^name=" src/main/resources/extension.properties | cut -d'=' -f2)
+        else
+          PROJECT_NAME=${{ github.event.repository.name }}
+        fi
+        echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
+        
+    - name: Package extension
+      run: |
+        mkdir -p dist
+        zip -r "dist/${{ steps.project_name.outputs.PROJECT_NAME }}.zip" . \
+          -x "*.git*" -x "dist/*" -x ".github/*" -x "*.DS_Store" -x "*.gradle*"
+        
+    - name: Upload extension zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.project_name.outputs.PROJECT_NAME }}
+        path: dist/${{ steps.project_name.outputs.PROJECT_NAME }}.zip
+        
+    - name: Upload as release asset
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/${{ steps.project_name.outputs.PROJECT_NAME }}.zip
+        tag_name: v${{ github.run_number }}
+        name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
