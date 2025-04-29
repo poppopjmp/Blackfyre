@@ -93,6 +93,54 @@ Installation:
 1. Copy files to your Binary Ninja plugins directory
 2. Install the Blackfyre Python library
 
+### Ghidra Plugin in Headless Mode
+
+Ghidra supports running the Blackfyre plugin in headless mode, which is useful for batch processing or automation.
+
+#### Sample Script
+
+```bash
+#!/bin/bash
+
+# Define paths - modify these according to your system
+GHIDRA_PATH="/usr/share/ghidra"  # Typical path in Kali
+PROJECT_DIR="/home/kali/ghidra_projects"
+PROJECT_NAME="BlackfyreAnalysis"
+INPUT_FILE="/path/to/your/binary"
+OUTPUT_DIR="/path/to/output"
+BLACKFYRE_PLUGIN_PATH="/home/kali/.ghidra/.ghidra_10.3/Extensions/Blackfyre"  # Update version as needed
+
+# Make the script executable
+chmod +x "${GHIDRA_PATH}/support/analyzeHeadless"
+
+# Create directory if it doesn't exist
+mkdir -p "${OUTPUT_DIR}"
+
+# Run Ghidra in headless mode
+"${GHIDRA_PATH}/support/analyzeHeadless" "${PROJECT_DIR}" "${PROJECT_NAME}" \
+  -import "${INPUT_FILE}" \
+  -postScript GenerateBinaryContext.java "${OUTPUT_DIR}" true true 30 \
+  -scriptPath "${BLACKFYRE_PLUGIN_PATH}/ghidra_scripts" \
+  -deleteProject \
+  -overwrite
+```
+
+#### Script Parameters
+
+The key parameters for the `GenerateBinaryContext.java` script are:
+
+1. `"${OUTPUT_DIR}"` - Directory where the BCC file will be saved
+2. `true` - Include raw binary data (set to `false` to exclude)
+3. `true` - Include decompiled code (set to `false` to exclude)
+4. `30` - Timeout in seconds for decompilation
+
+#### Usage
+
+1. Save the script to a file (e.g., `run_blackfyre_headless.sh`)
+2. Make it executable: `chmod +x run_blackfyre_headless.sh`
+3. Modify the paths to match your environment
+4. Run the script: `./run_blackfyre_headless.sh`
+
 ## 5. Future Extensions
 
 The following extensions are planned for future releases:
