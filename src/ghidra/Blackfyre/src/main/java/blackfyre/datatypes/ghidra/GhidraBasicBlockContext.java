@@ -16,86 +16,66 @@ import blackfyre.datatypes.ProcessorType;
 
 public class GhidraBasicBlockContext extends BasicBlockContext{
 	
-private Program theCurrentProgram;
+	private Program theCurrentProgram;
 	
 	private CodeBlock theBasicBlock;
 	
 	
 	public GhidraBasicBlockContext(Program currentProgram, CodeBlock basicBlock, ProcessorType procType)
 	{
-		super();	
-		
 		theCurrentProgram = currentProgram;
 		theBasicBlock = basicBlock;
 		theProcType = procType;
-	
 	}
 	
 	public boolean initialize()
 	{
-		
 		if(theIsInitialized)
 		{
 			return theIsInitialized;
 		}
 		
-		// Start Address (aka Entry Point Address)
 		theStartAddress = getStartAddressFromGhidra();
-		
-		// End Address
-		theEndAddress  = getEndAddressFromGhidra();
-		
-		
+		theEndAddress = getEndAddressFromGhidra();
 		theInstructionContexts = getInstructionContextsFromGhidra();
 		
-		
 		theIsInitialized = true;
-		
 		
 		return theIsInitialized;
 	}
 	
 	private InstructionContext [] getInstructionContextsFromGhidra()
 	{
+		ArrayList<InstructionContext> instructionContexts = new ArrayList<>();
 		
-		ArrayList<InstructionContext>  instructionContextList=  new ArrayList<InstructionContext>();
-		
-		
-		Address startAddress = theBasicBlock.getFirstStartAddress();	
-		Instruction currentInstruction = theCurrentProgram.getListing().getInstructionAt(startAddress);		
-		while(currentInstruction!=null && currentInstruction.getAddress().getOffset() <= theEndAddress)
-		{
+		try {
+			AddressSetView addresses = theBasicBlock.getAddresses(true);
+			AddressIterator addressIterator = addresses.getAddresses();
 			
-			GhidraInstructionContext ghidraInstructionContext = new GhidraInstructionContext(theCurrentProgram, currentInstruction);
-			
-			instructionContextList.add(ghidraInstructionContext);
-			
-			// Get the next instruction
-			currentInstruction = currentInstruction.getNext();
+			while (addressIterator.hasNext()) {
+				Address address = addressIterator.next();
+				Instruction instruction = theCurrentProgram.getListing().getInstructionAt(address);
+				
+				if (instruction != null) {
+					GhidraInstructionContext instructionContext = new GhidraInstructionContext(theCurrentProgram, instruction);
+					instructionContexts.add(instructionContext);
+				}
+			}
+		} catch (Exception e) {
+			System.err.println("Error getting instruction contexts: " + e.getMessage());
+			e.printStackTrace();
 		}
 		
-		InstructionContext [] instructionContexts = instructionContextList.toArray(new InstructionContext[instructionContextList.size()]);
-
-		
-		return instructionContexts;
+		return instructionContexts.toArray(new InstructionContext[instructionContexts.size()]);
 	}
 	
 	private long getStartAddressFromGhidra()
 	{
-		
-		long startAddress = theBasicBlock.getFirstStartAddress().getOffset();
-				
-		return startAddress;
+		return theBasicBlock.getFirstStartAddress().getOffset();
 	}
 	
 	private long getEndAddressFromGhidra()
 	{
-
-		long endAddress = theBasicBlock.getAddresses(false).next().getOffset();
-		
-		return endAddress;
+		return theBasicBlock.getMaxAddress().getOffset();
 	}
-	
-	
-
 }

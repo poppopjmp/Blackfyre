@@ -81,8 +81,10 @@ public class BinaryContext {
 
     public boolean initialize() throws Exception
     {
-        throw new UnsupportedOperationException();
-
+        // This is intended to be overridden by subclasses like GhidraBinaryContext
+        // Providing a base implementation that returns false
+        System.out.println("Warning: Using base BinaryContext.initialize(), this method should be overridden by a subclass");
+        return false;
     }
 
 
@@ -145,17 +147,17 @@ public class BinaryContext {
 
     public  HashMap<Long, DefinedData> getDefinedDataRefs()
     {
-    	return theDefinedDataMap;
+        return theDefinedDataMap;
     }
 
     public long getFileSize()
     {
-    	return theFileSize;
+        return theFileSize;
     }
 
     public String getDisassemblerVersion()
     {
-    	return theDisassemblerVersion;
+        return theDisassemblerVersion;
     }
 
 
@@ -733,7 +735,6 @@ public class BinaryContext {
         
     	
     	
-
     	if(messageType == MessageType.BINARY_CONTEXT_MSG )
     	{
     		// Write the message type as a byte

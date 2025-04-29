@@ -21,7 +21,6 @@ public class GhidraInstructionContext extends InstructionContext {
 	
 	public boolean initialize()
 	{
-		
 		if(theIsInitialized)
 		{
 			return theIsInitialized;
@@ -41,29 +40,27 @@ public class GhidraInstructionContext extends InstructionContext {
 		}
 		
 		theMnemonic  = getMnemonicFromGhidra();
-
-		
+		theSize = theInstruction.getLength();
 		
 		theIsInitialized = true;
-		
 		
 		return theIsInitialized;
 	}
 	
 	private long getAddressFromGhidra()
 	{
-		
 		return theInstruction.getAddress().getOffset();
 	}
 	
 	private byte [] getOpcodeBytesFromGhidra() throws MemoryAccessException
 	{
-		return theInstruction.getBytes();
+		byte[] bytes = new byte[theInstruction.getLength()];
+		theCurrentProgram.getMemory().getBytes(theInstruction.getAddress(), bytes);
+		return bytes;
 	}
 	
 	private String getMnemonicFromGhidra()
 	{
-		return theInstruction.getMnemonicString().toLowerCase();
+		return theInstruction.getMnemonicString();
 	}
-
 }
